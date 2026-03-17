@@ -1,0 +1,17 @@
+-- 2. 내 블로그 글 별 조회수를 Redis로 확인하고 싶다.
+--  1. 블로그 URL의 PATH는 /articles/{id} 형식이다.
+--  2. 로그인 여부와 상관없이 새로고침 될때마다 조회수가 하나 증가한다.
+--  3. 이를 관리하기 위해 적당한 데이터 타입을 선정하고,
+--  4. 사용자가 임의의 페이지에 접속할 때 실행될 명령을 작성해보자.
+
+-- Redis String 타입에서는 INCR, DECR 사용 가능
+INCR article:1
+INCR article:2
+INCR article:3
+
+-- 모든 블로그글의 조회수 조회
+MGET article:1 article:2 article:3
+
+-- 오늘의 조회수를 따로 관리
+INCR article:1:today
+RENAME article:1:today articles:2026-03-16

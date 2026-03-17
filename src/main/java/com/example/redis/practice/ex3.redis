@@ -1,0 +1,35 @@
+-- 3. 블로그에 로그인한 사람들의 조회수와 가장 많은 조회수를 기록한 글을 Redis로 확인하고 싶다.
+--     1. 블로그 URL의 PATH는 /articles/{id} 형식이다.
+--     2. 로그인 한 사람들의 계정은 영문으로만 이뤄져 있다. -> 중복 X
+--     3. 이를 관리하기 위해 적당한 데이터 타입을 선정하고,
+--     4. 사용자가 임의의 페이지에 접속할 때 실행될 명령을 작성해보자.
+--     5. 만약 상황에 따라 다른 명령이 실행되어야 한다면, 주석으로 추가해보자.
+
+FLUSHDB
+
+-- Set
+-- 게시글1을 조회한 사용자
+SADD articles:1 alex
+SADD articles:1 bred
+SADD articles:1 chad
+-- 게시글1 조회수
+SCARD articles:1
+
+-- 게시글2를 조회한 사용자 & 총 조회수
+SADD articles:2 alex
+SADD articles:2 chad
+SCARD articles:2
+
+SMEMBERS articles:1
+SMEMBERS articles:2
+
+-- 게시글 조회수 순위
+-- SADD의 결과에 따라 명령어 실행/스킵
+-- SADD 반환값이 0이면 스킵
+-- SADD 반환값이 1이면 Sorted Set에 추가
+ZINCRBY articles:ranks 1 articles:1
+ZINCRBY articles:ranks 1 articles:2
+
+-- 조회수가 가장 높은 게시글 조회(리더보드)
+ZREVRANGE articles:ranks 0 0
+ZRANGE articles:ranks 0 0 REV
